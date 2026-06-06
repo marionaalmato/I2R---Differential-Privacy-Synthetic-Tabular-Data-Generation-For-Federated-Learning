@@ -1,16 +1,40 @@
 # Differential Privacy Synthetic Tabular Data Generation for Federated Learning
 
-Bachelor's thesis project (UPC, FIB). Tutor: Prof. Cecilio Angulo.
+Bachelor's thesis project — Facultat d'Informàtica de Barcelona (UPC). Tutor: Prof. Cecilio Angulo.
 
-This project extends a UMAP-based synthetic healthcare data generator to a **federated** multi-hospital setting and adds **(ε, δ)-Differential Privacy** to every quantity shared between hospitals, so institutions can collaborate without ever exchanging raw patient records. Two generators are studied — a *partially synthetic* pipeline (Pipeline A) and a *fully synthetic* one (Pipeline B) — each evaluated in three settings: centralized, federated, and federated + DP. Experiments use the PI-CAI prostate cancer dataset, measuring fidelity, downstream utility (TSTR), and the privacy budget tracked by a custom privacy accountant.
+## Overview
 
-## Repository contents
+Machine learning in healthcare is limited by the scarcity of large, diverse datasets: medical records are sensitive, and legal and ethical constraints make sharing them between hospitals very difficult. Synthetic data is a common workaround, but on its own it gives no formal privacy guarantee and can still leak information about real patients.
 
-- `UMAP_data_generation*.ipynb` — Pipeline A (partially synthetic): centralized, federated, and federated + DP variants.
-- `Fully_UMAP_data_generation*.ipynb` / `Federated_UMAP*` — Pipeline B (fully synthetic): centralized, federated, and federated + DP variants.
-- `Use_case_A–D.ipynb` — additional clinical scenarios (varying missingness, different missing feature per hospital, PSAD reconstruction, small-hospital augmentation).
-- `marksheet_minimal.csv` — preprocessed PI-CAI data used by the notebooks.
+This project takes an existing UMAP-based synthetic data generator and extends it so that (1) several hospitals can collaborate **without ever exchanging raw records** (Federated Learning), and (2) every quantity shared between them carries a formal **(ε, δ)-Differential Privacy** guarantee, tracked by a custom privacy accountant.
 
-## Requirements
+Two generators are studied, each evaluated in three settings — **centralized**, **federated**, and **federated + DP**:
 
-Python 3.10 with `numpy`, `pandas`, `scikit-learn`, `umap-learn`, `matplotlib`. Open the notebooks in Jupyter and run top to bottom.
+- **Pipeline A (partially synthetic):** one reference hospital holds complete records; the others are missing one feature, which is the only column synthesised.
+- **Pipeline B (fully synthetic):** every feature is generated, so the output contains no real patient records.
+
+The method is evaluated on the PI-CAI prostate cancer dataset, measuring fidelity (Kolmogorov–Smirnov distance), downstream utility (train-on-synthetic / test-on-real), and the cumulative privacy budget.
+
+## Repository structure
+
+**`Code_partially/` — Pipeline A (partially synthetic)**
+
+- `UMAP_data_generation.ipynb` — centralized baseline
+- `UMAP_data_generation_federated_moreHospitals.ipynb` — federated variant
+- `UMAP_data_generation_federated_moreHospitals_DP.ipynb` — federated + Differential Privacy
+
+**`Code_fully/` — Pipeline B (fully synthetic)**
+
+- `Fully_UMAP_data_generation.ipynb` — centralized baseline
+- `Federated_UMAP_data_generation.ipynb` — federated variant
+- `Federated_UMAP_DP_data_generation.ipynb` — federated + Differential Privacy
+
+Each notebook is self-contained and can be run top to bottom to reproduce the corresponding results (UMAP embeddings, validation, synthetic samples, and the fidelity/utility metrics reported in the thesis).
+
+## Data
+
+Experiments use the public PI-CAI prostate cancer dataset. The notebooks expect the preprocessed table (`patient_age`, `psa`, `psad`, `psad_computed`, `prostate_volume`, and the binary target `case_csPCa`); the federated experiments simulate multiple hospitals via a stratified split on the target label.
+
+## Author
+
+Mariona Almató Baucells — UPC, June 2026.
